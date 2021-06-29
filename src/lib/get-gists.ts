@@ -1,21 +1,37 @@
 import got from 'got'
 
-const GIST_API_BASE_URL = 'https://api.github.com/users'
-const GIST_API_HEADERS = {
-    'Accept': 'application/vnd.github.v3+json'
+type Gist = {
+    files: GistFile[]
 }
 
+type GistFile = {
+    name: String
+}
 
+/**
+ * 
+ * @param gists 
+ * @returns 
+ */
+function mapper(gists: any) : Gist[] {
+    return gists.map((gist: any) => {
+        return {
+            file: {
+                name: gist.filename
+            }
+        }
+    })
+}
 
-
-const listGists = async (user: String) => {
+const listGists = async (username: String) : Promise<any> => {
     const options = {
-        baseUrl: GIST_API_BASE_URL,
-        headers: GIST_API_HEADERS,
+        baseUrl: 'https://api.github.com/users',
+        headers: {
+            'Accept': 'application/vnd.github.v3+json'
+        },
     } as const
-
-    const res = await got('phortuin/gists', options)
-    return res
+    const res = await got(`${username}/gists`, options)
+    return res.body
 }
 
 export default listGists
