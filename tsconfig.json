@@ -3,7 +3,6 @@
     "target": "ESNext",
     "lib": ["ESNext"],
     "module": "commonjs",
-    "noEmit": true,
     "esModuleInterop": true,
   },
   "include": ["./src/**/*"]
