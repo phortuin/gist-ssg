@@ -1,19 +1,19 @@
 import got from 'got'
-import { components } from "@octokit/openapi-types/packages/openapi-types/types";
+import { components } from "@octokit/openapi-types";
 
 type Gist = components["schemas"]["base-gist"]
 
 type GistMeta = {
-    id: String,
-    url: String,
-    description: String,
-    files: GistFiles[],
+    id: string,
+    url: string,
+    description: string,
+    files: GistFile[],
 }
 
-type GistFiles = {
-    filename: String,
-    url: String,
-    language: String,
+type GistFile = {
+    filename: string,
+    url: string,
+    language: string,
 }
 
 /**
@@ -36,16 +36,38 @@ function mapper(gists: Gist[]) : GistMeta[] {
     })
 }
 
-const getGists = async (username: String) : Promise<GistMeta[]> => {
+const getGists = async (username: string) : Promise<GistMeta[]> => {
     const options = {
         baseUrl: 'https://api.github.com/users',
         headers: {
             'Accept': 'application/vnd.github.v3+json'
         },
     }
-    const res = await got(`${username}/gists`, options)
-    const gists: Gist[] = JSON.parse(res.body)
-    return mapper(gists)
+    try {
+        const res = await got(`${username}/gists`, options)
+        const gists = JSON.parse(res.body)
+        mapper(gists)
+            .map((gist) => {
+                return gist.files.map((file) => {
+                    return getRawFile(file)
+                })
+            })
+        return mapper(gists)
+    } catch(error) {
+        return Promise.reject()
+    }
+}
+
+
+async function getRawFile(file: GistFile) : Promise<string> {
+    let content // moet dit niet een string zijn? Maar dan krijg ik 'Promise<string> is not assignable to string' of zo
+    try {
+        content = await got(file.url)
+    } catch(error) {
+        console.error(error)
+    }
+    console.log(content.body)
+    return content
 }
 
 export default getGists
