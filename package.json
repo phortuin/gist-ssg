@@ -9,6 +9,7 @@
     "got": "^9.6.0"
   },
   "devDependencies": {
+    "@octokit/openapi-types": "^11.2.0",
     "@types/dotenv-safe": "^8.1.1",
     "@types/got": "^9.6.11",
     "@types/node": "^15.12.5",
